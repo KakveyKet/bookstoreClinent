@@ -6,6 +6,10 @@ import Login from '../components/Login.vue'
 
 import Category from '../views/Category.vue';
 
+import Shop from '../views/Shop.vue';
+import UserRegister from '../form/UserRegister.vue'
+import useLogin from '../form/UserLogin.vue'
+
 const routes = [
   {
     path: '/',
@@ -15,13 +19,24 @@ const routes = [
       { path: '/dashboard', name: 'dashboard', component: Dashboard },
       { path: '/product', name: 'product', component: Product },
       { path: '/category', name: 'category', component: Category }
-
-
     ]
   },
   {
+    path: '/shop', name: 'shop', component: Shop
+  },
+
+  {
     path: '/login', name: 'login', component: Login
-  }
+  },
+  {
+    path: '/userregiser', name: 'userregiser', component: UserRegister
+  },
+  {
+    path: '/userlogin', name: 'userlogin', component: useLogin
+  },
+
+
+
 ]
 
 const router = createRouter({

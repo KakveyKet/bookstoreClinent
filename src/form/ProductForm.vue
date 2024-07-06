@@ -134,6 +134,7 @@ export default {
           }
         );
         console.log("Product added:", response.data);
+        handleClose();
       } catch (error) {
         console.error("Error adding product:", error);
       }

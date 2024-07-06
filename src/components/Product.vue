@@ -31,7 +31,7 @@
           <td class="min-w-[200px]">
             <img
               v-if="getImageUrl(product.image)"
-              class="w-32 h-32"
+              class="w-32 h-40 object-cover"
               :src="getImageUrl(product.image)"
               alt=""
             />
