@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import url("https://fonts.googleapis.com/css2?family=Moul&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Moul&family=Noto+Sans+Khmer:wght@100..900&display=swap");
+body {
+  font-family: "Noto Sans Khmer";
+  background-color: #f4f4f4;
+}
+@layer base {
+  .route {
+    @apply w-[90%] text-nowrap rounded-[8px] text-default font-semibold mt-4 px-4 h-[60px] text-center bg-primary hover:bg-primary/70 duration-300 active:bg-primary/80   mx-auto flex items-center justify-start gap-4;
+  }
+  .btnlogout {
+    @apply rounded-[8px] bg-primary3 text-default font-semibold px-4 text-center p-3 hover:bg-primary3/70 duration-300 active:bg-primary3/80   mx-auto flex items-center justify-start gap-4;
+  }
+}
+table {
+  font-family: "Noto Sans Khmer";
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td,
+th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+/* tr:nth-child(even) {
+  background-color: #2d71f872;
+  color: white;
+} */
+@layer reset, primevue;
