@@ -13,7 +13,6 @@
       />
     </div>
 
-    <!-- Product Price -->
     <div>
       <label>Product Price</label>
       <br />

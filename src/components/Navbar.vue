@@ -15,6 +15,12 @@
       >
         Product List
       </h2>
+      <h2
+        v-if="$route.path.startsWith('/category')"
+        class="text-heading2 font-bold text-primary ml-4"
+      >
+        Category List
+      </h2>
       <!-- Profile -->
       <div v-if="user" class="flex items-center mr-4">
         <div

@@ -1,7 +1,7 @@
 <template>
-  <div class="bg-white">
+  <div class="bg-white relative">
     <!-- head -->
-    <div class="w-full bg-white shadow-lg">
+    <div class="w-full bg-white shadow-lg sticky top-0 z-50">
       <div class="max-w-[1400px] mx-auto">
         <el-menu
           :default-active="activeIndex"
@@ -31,15 +31,37 @@
               </div>
             </el-tooltip>
           </div>
-          <div class="mr-4">
-            <el-button
-              class="w-10 h-10"
-              @click="drawer = true"
-              type="primary"
-              :icon="ShoppingCart"
-              circle
-            />
-            <el-button type="success" :icon="Notification" circle />
+          <div class="mr-4 space-x-3">
+            <el-badge :value="cartItems.length" class="item">
+              <el-button
+                class="w-10 h-10"
+                @click="handleDrawer"
+                type="primary"
+                :icon="ShoppingCart"
+                circle
+              />
+            </el-badge>
+            <el-badge class="item">
+              <el-button
+                @click="Istorydrawer"
+                type="success"
+                :icon="Notification"
+                circle
+              />
+            </el-badge>
+            <el-badge v-if="user" class="item">
+              <el-button @click="logout" type="success" :icon="Back" circle />
+            </el-badge>
+            <router-link to="/userregister">
+              <el-badge v-if="!user" class="item">
+                <el-button
+                  @click="logout"
+                  type="success"
+                  :icon="UserFilled"
+                  circle
+                />
+              </el-badge>
+            </router-link>
           </div>
         </el-menu>
       </div>
@@ -121,36 +143,14 @@
       </div>
     </div>
     <el-drawer v-model="drawer" title="I am the title" :with-header="false">
-      <div>
-        <h2>Your Cart</h2>
-        <ul v-if="cartItems.length > 0">
-          <li v-for="item in cartItems" :key="item.id">
-            <div>
-              Product Name: {{ item.product ? item.product.name : "Unknown" }}
-            </div>
-            <div>Quantity: {{ item.quantity }}</div>
-            <div>
-              Price: ${{ item.product ? item.product.price : "Unknown" }}
-            </div>
-            <div>
-              Category:
-              {{
-                item.product && item.product.category
-                  ? item.product.category.name
-                  : "Unknown"
-              }}
-            </div>
-            <div>
-              <img
-                :src="item.product ? item.product.image : ''"
-                alt="Product Image"
-                style="max-width: 100px; height: auto"
-              />
-            </div>
-          </li>
-        </ul>
-        <p v-else>No items in your cart.</p>
-      </div>
+      <component :is="currentComponent" />
+    </el-drawer>
+    <el-drawer
+      v-model="historydrawer"
+      title="I am the title"
+      :with-header="false"
+    >
+      <component :is="currentComponent" />
     </el-drawer>
   </div>
 </template>
@@ -158,8 +158,10 @@
 <script setup>
 import Curacel from "../views/Curacel.vue";
 import axiosInstance from "../api/index"; // Adjust the path to your axios instance
-
+import CartItem from "../views/CartItem.vue";
 import { ref, onMounted } from "vue";
+import History from "../views/History.vue";
+import { useRouter } from "vue-router";
 import {
   Check,
   Delete,
@@ -169,6 +171,8 @@ import {
   ShoppingCart,
   Notification,
   Search,
+  Back,
+  UserFilled,
 } from "@element-plus/icons-vue";
 
 const activeIndex = ref("1");
@@ -189,16 +193,6 @@ const fetchCategories = async () => {
     categories.value = response.data;
   } catch (error) {
     console.error("Error fetching categories:", error);
-  }
-};
-const item = ref([]);
-
-const FetchItems = async () => {
-  try {
-    const response = await axiosInstance.get("/cart");
-    item.value = response.data;
-  } catch (error) {
-    console.error("Error fetching items:", error);
   }
 };
 
@@ -240,18 +234,17 @@ const filterProducts = () => {
 };
 
 const getImageUrl = (imagePath) => {
-  return `http://127.0.0.1:8000/storage/${imagePath}`; // Adjust the base URL as necessary
+  return `http://127.0.0.1:8000/storage/${imagePath}`;
 };
-// Call the fetchProducts function when the component is mounted
 onMounted(() => {
   fetchProducts();
   fetchUser();
   fetchCategories();
-  addToCart();
   fetchCartItems();
 });
 
 const user = ref(null);
+const isAuthenticated = ref(false);
 
 const fetchUser = async () => {
   try {
@@ -270,35 +263,69 @@ const fetchUser = async () => {
 
     console.log("User response:", response.data); // Log the response
     user.value = response.data;
+    isAuthenticated.value = true; // Set authenticated to true
   } catch (error) {
     console.error("Error fetching user:", error);
+    isAuthenticated.value = false; // Set authenticated to false on error
   }
 };
 
-const addToCart = async (productId, quantity) => {
+const cartItems = ref([]);
+const addToCart = async (productId) => {
   try {
-    const response = await axiosInstance.post("/cart/add", {
+    await axiosInstance.post("/cart/add", {
       product_id: productId,
       quantity: 1,
     });
-
-    console.log("Product added to cart:", response.data);
+    fetchCartItems(); // Refresh cart items after addition
   } catch (error) {
-    console.error("Error adding product to cart:", error);
+    console.error(
+      "Error adding item to cart:",
+      error.response ? error.response.data : error.message
+    );
   }
 };
-
-const drawer = ref(false);
-
-const cartItems = ref([]);
-
-// Fetch cart items from API
 const fetchCartItems = async () => {
   try {
     const response = await axiosInstance.get("/cart");
     cartItems.value = response.data.cartItems;
   } catch (error) {
     console.error("Error fetching cart items:", error);
+  }
+};
+
+const drawer = ref(false);
+const historydrawer = ref(false);
+const Istorydrawer = () => {
+  currentComponent.value = History;
+  historydrawer.value = true;
+};
+const currentComponent = ref(null);
+const handleDrawer = () => {
+  fetchCartItems();
+  currentComponent.value = CartItem;
+  drawer.value = true;
+};
+
+const router = useRouter();
+
+const logout = async () => {
+  try {
+    await axiosInstance.post(
+      "/logout",
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+    localStorage.removeItem("token");
+    user.value = null;
+    isAuthenticated.value = false;
+    router.push("/login");
+  } catch (error) {
+    console.error("Error logging out:", error);
   }
 };
 </script>
