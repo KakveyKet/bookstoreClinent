@@ -54,12 +54,7 @@
             </el-badge>
             <router-link to="/userregister">
               <el-badge v-if="!user" class="item">
-                <el-button
-                  @click="logout"
-                  type="success"
-                  :icon="UserFilled"
-                  circle
-                />
+                <el-button type="success" :icon="UserFilled" circle />
               </el-badge>
             </router-link>
           </div>
@@ -161,6 +156,8 @@ import axiosInstance from "../api/index"; // Adjust the path to your axios insta
 import CartItem from "../views/CartItem.vue";
 import { ref, onMounted } from "vue";
 import History from "../views/History.vue";
+import { ElMessageBox } from "element-plus"; // Import ElMessageBox for delete confirmation
+
 import { useRouter } from "vue-router";
 import {
   Check,
@@ -311,21 +308,36 @@ const router = useRouter();
 
 const logout = async () => {
   try {
-    await axiosInstance.post(
-      "/logout",
-      {},
+    const confirmed = await ElMessageBox.confirm(
+      "Are you sure you want to log out?",
+      "Logout Confirmation",
       {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
+        confirmButtonText: "Yes",
+        cancelButtonText: "No",
+        type: "warning",
       }
     );
-    localStorage.removeItem("token");
-    user.value = null;
-    isAuthenticated.value = false;
-    router.push("/login");
+
+    if (confirmed) {
+      await axiosInstance.post(
+        "/logout",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      localStorage.removeItem("token");
+      user.value = null;
+      isAuthenticated.value = false;
+      router.push("/userregister");
+    }
   } catch (error) {
-    console.error("Error logging out:", error);
+    if (error !== "cancel") {
+      console.error("Error logging out:", error);
+    }
   }
 };
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <div class="w-[200px] bg-white h-screen shadow-lg flex flex-col relative">
+  <div class="w-[200px] bg-white h-[110vh] shadow-lg flex flex-col relative">
     <router-link
       class="w-32 h-32 overflow-hidden text-center mx-auto flex items-center justify-center"
       to="/dashboard"
@@ -399,7 +399,7 @@
       </svg>
       Punchas
     </router-link>
-    <button class="btnlogout absolute bottom-12 left-2">
+    <button class="btnlogout absolute bottom-32 left-2">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"
