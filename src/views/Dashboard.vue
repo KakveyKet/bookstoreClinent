@@ -94,7 +94,7 @@
           <h4
             class="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900"
           >
-            3,462
+            {{ purchasesToday.length }}
           </h4>
         </div>
       </div>
@@ -168,11 +168,38 @@ const fetchProducts = async () => {
     console.error("Error fetching products:", error);
   }
 };
+const purchasesToday = ref([]);
+
+const getAllPurchasesToday = async () => {
+  try {
+    const response = await axiosInstance.get("/purchases");
+    const allPurchases = response.data.purchases;
+
+    // Get today's date in UTC format
+    const today = new Date().toISOString().slice(0, 10);
+
+    // Filter purchases for today's date
+    const purchasesTodayFiltered = allPurchases.filter((purchase) => {
+      // Assuming created_at is in ISO 8601 format (e.g., "2024-07-11T08:30:00Z")
+      const createdAtDate = new Date(purchase.created_at)
+        .toISOString()
+        .slice(0, 10); // Convert created_at to ISO format and extract date part
+
+      return createdAtDate === today;
+    });
+
+    // Set purchasesToday.value to filtered purchases
+    purchasesToday.value = purchasesTodayFiltered;
+  } catch (error) {
+    console.error("Error fetching purchases:", error);
+  }
+};
 
 onMounted(() => {
   fetchProducts();
   getAllPurchases();
   fetchCategories();
+  getAllPurchasesToday();
 });
 </script>
 

@@ -318,8 +318,8 @@
       </svg>
     </router-link>
     <router-link class="route" to="/dashboard"
-      ><span
-        ><svg
+      ><span>
+        <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
           fill="currentColor"
@@ -397,9 +397,9 @@
           clip-rule="evenodd"
         />
       </svg>
-      Punchas
+      Purchase
     </router-link>
-    <button class="btnlogout absolute bottom-32 left-2">
+    <button @click="logout" class="btnlogout absolute bottom-32 left-2">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"
@@ -418,7 +418,51 @@
 </template>
 
 <script>
-export default {};
+import { ElMessageBox } from "element-plus";
+import axiosInstance from "@/api/index";
+import { useRouter } from "vue-router";
+import { ref, onMounted } from "vue";
+export default {
+  setup() {
+    const router = useRouter();
+    const logout = async () => {
+      try {
+        const confirmed = await ElMessageBox.confirm(
+          "Are you sure you want to log out?",
+          "Logout Confirmation",
+          {
+            confirmButtonText: "Yes",
+            cancelButtonText: "No",
+            type: "warning",
+          }
+        );
+
+        if (confirmed) {
+          await axiosInstance.post(
+            "/logout",
+            {},
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            }
+          );
+
+          localStorage.removeItem("token");
+          router.push("/login");
+        }
+      } catch (error) {
+        if (error !== "cancel") {
+          console.error("Error logging out:", error);
+        }
+      }
+    };
+
+    return {
+      logout,
+    };
+  },
+};
 </script>
 
 <style></style>

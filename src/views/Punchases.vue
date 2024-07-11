@@ -34,9 +34,11 @@
           <tr class="bg-gray-200">
             <th class="py-2 px-4 text-left">No</th>
             <th class="py-2 px-4 text-left">Date</th>
-            <th class="py-2 px-4 text-left">User Name</th>
+            <th class="py-2 px-4 text-left text-nowrap">User Name</th>
+            <th class="py-2 px-4 text-left">User Email</th>
             <th class="py-2 px-4 text-left">Product Name</th>
-            <th class="py-2 px-4 text-left">Product Price</th>
+
+            <th class="py-2 px-4 text-left text-nowrap">Product Price</th>
             <th class="py-2 px-4 text-left">Quantity</th>
             <th class="py-2 px-4 text-left">Image</th>
             <th class="py-2 px-4 text-left">Actions</th>
@@ -51,6 +53,8 @@
             <td class="py-2 px-4">{{ index + 1 }}</td>
             <td class="py-2 px-4">{{ formatDate(purchase.created_at) }}</td>
             <td class="py-2 px-4">{{ purchase.user_name || "Unknown" }}</td>
+            <td class="py-2 px-4 text-left">{{ purchase.user_email }}</td>
+
             <td class="py-2 px-4">{{ purchase.product_name || "Unknown" }}</td>
             <td class="py-2 px-4">$ {{ purchase.price || "Unknown" }}</td>
             <td class="py-2 px-4">{{ purchase.quantity }}</td>
