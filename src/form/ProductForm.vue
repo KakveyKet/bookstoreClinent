@@ -89,8 +89,8 @@ import axios from "axios";
 import { ref, onMounted } from "vue";
 
 export default {
-  props: [""],
-  name: "AddProduct",
+  props: ["itemtoedit"],
+  name: "ProductForm",
   setup(props, { emit }) {
     const name = ref("");
     const category_id = ref("");
@@ -98,6 +98,7 @@ export default {
     const code = ref("");
     const image = ref(null);
     const categories = ref([]);
+    const products = ref([]); // Define products as a reactive reference
 
     const handleFileUpload = (event) => {
       image.value = event.target.files[0];
@@ -120,31 +121,71 @@ export default {
       formData.append("category_id", category_id.value);
       formData.append("price", price.value);
       formData.append("code", code.value);
-      formData.append("image", image.value);
+      if (image.value) {
+        formData.append("image", image.value);
+      }
 
       try {
-        const response = await axios.post(
-          "http://127.0.0.1:8000/api/products",
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
+        let response;
+        if (props.itemtoedit) {
+          response = await axios.put(
+            `http://127.0.0.1:8000/api/products/${props.itemtoedit.id}`,
+            formData,
+            {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          );
+        } else {
+          response = await axios.post(
+            "http://127.0.0.1:8000/api/products",
+            formData,
+            {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          );
+        }
+
+        console.log("Product saved:", response.data);
+
+        // Update local state or data after successful update
+        const updatedProduct = response.data;
+        const index = products.value.findIndex(
+          (p) => p.id === updatedProduct.id
         );
-        console.log("Product added:", response.data);
-        handleClose();
+        if (index !== -1) {
+          products.value.splice(index, 1, updatedProduct);
+        } else {
+          products.value.push(updatedProduct);
+        }
+
+        handleClose(); // Close the form after successful save
       } catch (error) {
-        console.error("Error adding product:", error);
+        if (error.response && error.response.data) {
+          console.error("Error saving product:", error.response.data);
+        } else {
+          console.error("Error saving product:", error.message);
+        }
       }
     };
 
     const handleClose = () => {
-      emit("close");
+      emit("close"); // Emit event to close the dialog or form
     };
 
-    onMounted(() => {
+    onMounted(async () => {
       fetchCategories();
+
+      // Populate form fields if editing existing product
+      if (props.itemtoedit) {
+        name.value = props.itemtoedit.name;
+        category_id.value = props.itemtoedit.category_id;
+        price.value = props.itemtoedit.price;
+        code.value = props.itemtoedit.code;
+      }
     });
 
     return {
@@ -157,6 +198,7 @@ export default {
       handleFileUpload,
       saveProduct,
       handleClose,
+      products, // Include products in the returned setup object
     };
   },
 };

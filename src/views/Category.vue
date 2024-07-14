@@ -14,9 +14,7 @@
     </div>
 
     <!-- Category Table -->
-    <div
-      class="w-full max-w-[1000px] h-[700px] p-5 rounded-lg shadow-lg border overflow-auto"
-    >
+    <div class="w-full max-w-[1000px] h-[700px] p-5 rounded-lg shadow-lg border overflow-auto">
       <table class="w-full table-auto">
         <thead>
           <tr class="bg-gray-200">
@@ -26,77 +24,51 @@
           </tr>
         </thead>
         <tbody>
-          <tr
-            v-for="(category, index) in filteredCategories"
-            :key="category.id"
-          >
-            <td class="py-2 px-4">{{ index + 1 }}</td>
+          <tr v-for="(category, index) in paginatedCategories" :key="category.id">
+            <td class="py-2 px-4">{{ (currentPage - 1) * pageSize + index + 1 }}</td>
             <td class="py-2 px-4">{{ category.name }}</td>
             <td class="py-2 px-4">
-              <button
-                @click="handleEditCategory(category)"
-                class="text-indigo-600 hover:text-indigo-900"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  class="size-6 text-primary2"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
-                  />
+              <button @click="handleEditCategory(category)" class="text-indigo-600 hover:text-indigo-900">
+                <!-- Edit Icon SVG -->
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 text-primary2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
                 </svg>
               </button>
-              <button
-                @click="confirmDelete(category.id)"
-                class="text-red-600 hover:text-red-900 ml-2"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  class="size-6 text-red-500"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
-                  />
+              <button @click="confirmDelete(category.id)" class="text-red-600 hover:text-red-900 ml-2">
+                <!-- Delete Icon SVG -->
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 text-red-500">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
                 </svg>
               </button>
             </td>
           </tr>
-          <tr v-if="filteredCategories.length === 0">
-            <td colspan="3" class="py-4 px-4 text-center text-gray-500">
-              No categories found
-            </td>
+          <tr v-if="paginatedCategories.length === 0">
+            <td colspan="3" class="py-4 px-4 text-center text-gray-500">No categories found</td>
           </tr>
         </tbody>
       </table>
+
+      <!-- Pagination -->
+      <div class="flex justify-end mt-4">
+        <el-pagination
+          :current-page.sync="currentPage"
+          :page-size="pageSize"
+          :total="totalCategories"
+          layout="prev, pager, next"
+          @current-change="handlePageChange"
+        />
+      </div>
+
       <!-- Add/Edit Category Dialog -->
-      <el-dialog
-        v-model="dialogVisible"
-        width="500"
-        :before-close="handleClose"
-      >
+      <el-dialog v-model="dialogVisible" width="500" :before-close="handleClose">
         <div>
-          <component
-            :itemtoedit="itemtoedit"
-            @close="handleClose"
-            :is="currentComponent"
-          ></component>
+          <component :itemtoedit="itemtoedit" @close="handleClose" :is="currentComponent"></component>
         </div>
       </el-dialog>
     </div>
   </div>
 </template>
+
 <script>
 import { ref, onMounted, computed } from "vue";
 import axiosInstance from "../api/index";
@@ -108,6 +80,40 @@ export default {
     CategoryForm,
   },
   setup() {
+    const categories = ref([]);
+    const searchQuery = ref("");
+    const dialogVisible = ref(false);
+    const currentComponent = ref("");
+    const dialogTitle = ref("Add/Edit Category");
+    const currentPage = ref(1);
+    const pageSize = 10; // Number of categories per page
+    const totalCategories = ref(0);
+    const itemtoedit = ref(null);
+
+    const fetchCategories = async () => {
+      try {
+        const response = await axiosInstance.get("/categories");
+        categories.value = response.data;
+        totalCategories.value = categories.value.length; // Update total categories
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+
+    const paginatedCategories = computed(() => {
+      const start = (currentPage.value - 1) * pageSize;
+      const end = currentPage.value * pageSize;
+      if (!searchQuery.value) {
+        return categories.value.slice(start, end);
+      }
+      const query = searchQuery.value.toLowerCase();
+      const filtered = categories.value.filter((category) =>
+        category.name.toLowerCase().includes(query)
+      );
+      totalCategories.value = filtered.length; // Update total categories for filtered results
+      return filtered.slice(start, end);
+    });
+
     const confirmDelete = (categoryId) => {
       ElMessageBox.confirm(
         "Are you sure you want to delete this category?",
@@ -125,31 +131,7 @@ export default {
           // Cancel action
         });
     };
-    const categories = ref([]);
-    const searchQuery = ref("");
-    const dialogVisible = ref(false);
-    const currentComponent = ref("");
-    const dialogTitle = ref("Add/Edit Category");
 
-    const fetchCategories = async () => {
-      try {
-        const response = await axiosInstance.get("/categories");
-        categories.value = response.data;
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      }
-    };
-
-    const filteredCategories = computed(() => {
-      if (!searchQuery.value) {
-        return categories.value;
-      }
-      const query = searchQuery.value.toLowerCase();
-      return categories.value.filter((category) =>
-        category.name.toLowerCase().includes(query)
-      );
-    });
-    const itemtoedit = ref(null);
     const handleEditCategory = (category) => {
       dialogVisible.value = true;
       currentComponent.value = "CategoryForm";
@@ -178,7 +160,11 @@ export default {
       dialogTitle.value = "Add/Edit Category"; // Reset dialog title
       fetchCategories(); // Refresh categories after closing dialog
     };
-    console.log(itemtoedit);
+
+    const handlePageChange = (newPage) => {
+      currentPage.value = newPage;
+    };
+
     onMounted(() => {
       fetchCategories();
     });
@@ -186,7 +172,7 @@ export default {
     return {
       categories,
       searchQuery,
-      filteredCategories,
+      paginatedCategories,
       dialogVisible,
       currentComponent,
       dialogTitle,
@@ -196,9 +182,13 @@ export default {
       handleClose,
       confirmDelete,
       itemtoedit,
+      currentPage,
+      pageSize,
+      totalCategories,
+      handlePageChange,
     };
   },
 };
 </script>
 
-<style></style>
+<style></style

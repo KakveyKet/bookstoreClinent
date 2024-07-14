@@ -133,6 +133,38 @@
           </h4>
         </div>
       </div>
+      <div
+        class="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md"
+      >
+        <div
+          class="bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-indigo-600 to-indigo-400 text-white shadow-indigo-500/40 shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            class="size-6"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z"
+              clip-rule="evenodd"
+            />
+          </svg>
+        </div>
+        <div class="p-4 text-right">
+          <p
+            class="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600"
+          >
+            Users
+          </p>
+          <h4
+            class="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900"
+          >
+            {{ users.length }}
+          </h4>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -194,12 +226,23 @@ const getAllPurchasesToday = async () => {
     console.error("Error fetching purchases:", error);
   }
 };
+const users = ref([]);
+
+const fetchUsers = async () => {
+  try {
+    const response = await axiosInstance.get("/users");
+    users.value = response.data.filter((user) => user.rols === "customer");
+  } catch (error) {
+    console.error("Error fetching users:", error);
+  }
+};
 
 onMounted(() => {
   fetchProducts();
   getAllPurchases();
   fetchCategories();
   getAllPurchasesToday();
+  fetchUsers();
 });
 </script>
 

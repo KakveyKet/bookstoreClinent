@@ -9,7 +9,7 @@ import UserRegister from '../form/UserRegister.vue';
 import useLogin from '../form/UserLogin.vue';
 import Punchases from '@/views/Punchases.vue';
 import ToDayOrder from '@/views/ToDayOrder.vue';
-
+import User from '@/views/User.vue'
 const routes = [
   {
     path: '/',
@@ -20,7 +20,9 @@ const routes = [
       { path: '/product', name: 'product', component: Product },
       { path: '/category', name: 'category', component: Category },
       { path: '/punchase', name: 'punchase', component: Punchases },
-      { path: '/todayorder', name: 'todayorder', component: ToDayOrder }
+      { path: '/todayorder', name: 'todayorder', component: ToDayOrder },
+      { path: '/users', name: 'users', component: User }
+
     ]
   },
   {

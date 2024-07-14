@@ -32,26 +32,32 @@
             </el-tooltip>
           </div>
           <div class="mr-4 space-x-3">
-            <el-badge :value="cartItems.length" class="item">
-              <el-button
-                class="w-10 h-10"
-                @click="handleDrawer"
-                type="primary"
-                :icon="ShoppingCart"
-                circle
-              />
-            </el-badge>
-            <el-badge class="item">
-              <el-button
-                @click="Istorydrawer"
-                type="success"
-                :icon="Notification"
-                circle
-              />
-            </el-badge>
-            <el-badge v-if="user" class="item">
-              <el-button @click="logout" type="success" :icon="Back" circle />
-            </el-badge>
+            <el-tooltip content="View Cart" placement="bottom" effect="dark">
+              <el-badge :value="cartItems.length" class="item">
+                <el-button
+                  class="w-10 h-10"
+                  @click="handleDrawer"
+                  type="primary"
+                  :icon="ShoppingCart"
+                  circle
+                />
+              </el-badge>
+            </el-tooltip>
+            <el-tooltip content="View History" placement="bottom" effect="dark">
+              <el-badge class="item">
+                <el-button
+                  @click="Istorydrawer"
+                  type="success"
+                  :icon="Notification"
+                  circle
+                />
+              </el-badge>
+            </el-tooltip>
+            <el-tooltip content="Log out" placement="bottom" effect="dark">
+              <el-badge v-if="user" class="item">
+                <el-button @click="logout" type="success" :icon="Back" circle />
+              </el-badge>
+            </el-tooltip>
             <router-link to="/userregister">
               <el-badge v-if="!user" class="item">
                 <el-button type="success" :icon="UserFilled" circle />
@@ -103,7 +109,7 @@
     </div>
     <div class="max-w-[1400px] mx-auto p-5 grid grid-cols-4 space-x-3 gap-y-3">
       <div
-        v-for="product in filteredProducts"
+        v-for="product in paginatedProducts"
         :key="product"
         class="w-[300px] h-auto bg-white rounded-lg shadow-lg hover:shadow-md overflow-hidden"
       >
@@ -137,6 +143,16 @@
         </div>
       </div>
     </div>
+    <!-- Pagination -->
+    <div class="flex justify-center mt-4">
+      <el-pagination
+        :current-page="currentPage"
+        :page-size="pageSize"
+        :total="totalProducts"
+        layout="prev, pager, next"
+        @current-change="handlePageChange"
+      />
+    </div>
     <el-drawer v-model="drawer" title="I am the title" :with-header="false">
       <component :is="currentComponent" />
     </el-drawer>
@@ -154,7 +170,7 @@
 import Curacel from "../views/Curacel.vue";
 import axiosInstance from "../api/index"; // Adjust the path to your axios instance
 import CartItem from "../views/CartItem.vue";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import History from "../views/History.vue";
 import { ElMessageBox } from "element-plus"; // Import ElMessageBox for delete confirmation
 
@@ -182,7 +198,9 @@ const searchQuery = ref("");
 const selectedCategory = ref(null);
 const products = ref([]);
 const categories = ref([]);
-const filteredProducts = ref([]);
+const currentPage = ref(1);
+const pageSize = 4; // Number of products per page
+const totalProducts = ref(0);
 
 const fetchCategories = async () => {
   try {
@@ -202,13 +220,14 @@ const fetchProducts = async () => {
       },
     });
     products.value = response.data;
+    totalProducts.value = products.value.length;
     filterProducts();
   } catch (error) {
     console.error("Error fetching products:", error);
   }
 };
 
-const filterProducts = () => {
+const filteredProducts = computed(() => {
   let filtered = [...products.value];
 
   // Filter by search query
@@ -227,12 +246,19 @@ const filterProducts = () => {
     );
   }
 
-  filteredProducts.value = filtered;
-};
+  return filtered;
+});
+
+const paginatedProducts = computed(() => {
+  const start = (currentPage.value - 1) * pageSize;
+  const end = currentPage.value * pageSize;
+  return filteredProducts.value.slice(start, end);
+});
 
 const getImageUrl = (imagePath) => {
   return `http://127.0.0.1:8000/storage/${imagePath}`;
 };
+
 onMounted(() => {
   fetchProducts();
   fetchUser();
@@ -305,6 +331,10 @@ const handleDrawer = () => {
 };
 
 const router = useRouter();
+
+const handlePageChange = (page) => {
+  currentPage.value = page;
+};
 
 const logout = async () => {
   try {
