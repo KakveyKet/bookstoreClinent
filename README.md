@@ -1,3 +1,6 @@
+#my project using vue js 3 
+#tailwind css and element plus for ui 
+
 # myproject
 
 ## Project setup
